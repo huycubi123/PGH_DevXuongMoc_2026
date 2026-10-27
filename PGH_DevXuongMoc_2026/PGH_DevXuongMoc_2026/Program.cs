@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using PGH_DevXuongMoc_2026.Models;
+
 namespace PGH_DevXuongMoc_2026
 {
     public class Program
@@ -9,6 +12,12 @@ namespace PGH_DevXuongMoc_2026
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            // Add DbContext with SQL Server connection string
+            var connectionString = builder.Configuration.GetConnectionString("DevXuongMocConn");
+            builder.Services.AddDbContext<DevXuongMocContext>(options =>
+                options.UseSqlServer(connectionString));
+
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

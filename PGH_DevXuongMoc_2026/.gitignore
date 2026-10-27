@@ -1,0 +1,84 @@
+## ==========================================
+## 1. Visual Studio & .NET / C# (Quan trọng nhất)
+## ==========================================
+# Build results & Output directories
+[Bb]in/
+[Oo]bj/
+[LGs]og/
+[Lgs]ogs/
+[Tt]est[Rr]esult*/
+[Bb]uildLog.*
+
+# Visual Studio cache & temporary files
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+*.vsp
+*.vspf
+*.vspscc
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains Rider / Resharper
+.idea/
+*_ReSharper*/
+*.ReSharper.user
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+packages/
+**/packages/*
+!**/packages/build/
+
+# Entity Framework / SQL Server LocalDB
+*.mdf
+*.ldf
+*.log
+
+## ==========================================
+## 2. Frontend / Web (Nếu có dùng Node/React)
+## ==========================================
+node_modules/
+dist/
+build/
+.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+## ==========================================
+## 3. Environment & Security (Bảo mật)
+## ==========================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+appsettings*.Development.json
+appsettings*.Local.json
+
+## ==========================================
+## 4. System Files (Hệ điều hành)
+## ==========================================
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride

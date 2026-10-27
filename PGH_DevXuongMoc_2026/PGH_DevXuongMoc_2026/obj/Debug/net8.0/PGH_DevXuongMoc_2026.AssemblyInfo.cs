@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PGH_DevXuongMoc_2026")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f708529a6c5cfc04bab022c8686b58951bcf745b")]
 [assembly: System.Reflection.AssemblyProductAttribute("PGH_DevXuongMoc_2026")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PGH_DevXuongMoc_2026")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
