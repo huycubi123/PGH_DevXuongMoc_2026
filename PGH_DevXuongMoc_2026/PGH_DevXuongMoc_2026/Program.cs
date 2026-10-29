@@ -14,10 +14,10 @@ namespace PGH_DevXuongMoc_2026
 
             // Add DbContext with SQL Server connection string
             var connectionString = builder.Configuration.GetConnectionString("DevXuongMocConn");
-            builder.Services.AddDbContext<DevXuongMocContext>(options =>
+            builder.Services.AddDbContext<XuongMocContext>(options =>
                 options.UseSqlServer(connectionString));
 
-            
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -34,6 +34,10 @@ namespace PGH_DevXuongMoc_2026
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.MapControllerRoute(
+                name: "areas",
+                pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
             app.MapControllerRoute(
                 name: "default",

@@ -1,0 +1,67 @@
+﻿@model PGH_DevXuongMoc_2026.Models.Category
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "_LayoutAdmin";
+}
+
+<h1>Edit</h1>
+
+<h4>Category</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="IconPath" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <input type="hidden" asp-for="CreatedBy" />
+
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Slug" class="control-label"></label>
+                <input asp-for="Slug" class="form-control" />
+                <span asp-validation-for="Slug" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IconPath" class="control-label"></label>
+                <input type="file" name="iconFile" class="form-control" accept="image/*" />
+                @if (!string.IsNullOrEmpty(Model.IconPath))
+                {
+                    <div class="mt-2">
+                        <img src="~/@Model.IconPath" alt="@Model.Name" style="max-height: 80px;" />
+                    </div>
+                }
+                <span asp-validation-for="IconPath" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SortOrder" class="control-label"></label>
+                <input asp-for="SortOrder" class="form-control" />
+                <span asp-validation-for="SortOrder" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsVisible" /> @Html.DisplayNameFor(model => model.IsVisible)
+                </label>
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

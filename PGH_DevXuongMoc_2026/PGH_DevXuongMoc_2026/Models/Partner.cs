@@ -7,25 +7,19 @@ public partial class Partner
 {
     public int Id { get; set; }
 
-    public string? Title { get; set; }
+    public string Name { get; set; } = null!;
 
-    public string? Logo { get; set; }
+    public string? LogoPath { get; set; }
 
-    public string? Url { get; set; }
+    public bool ShowOnHome { get; set; }
 
-    public byte? Orders { get; set; }
+    public bool IsVisible { get; set; }
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public DateTime? UpdatedDate { get; set; }
+    public string? CreatedBy { get; set; }
 
-    public string? AdminCreated { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
-    public string? AdminUpdated { get; set; }
-
-    public string? Content { get; set; }
-
-    public byte? Status { get; set; }
-
-    public bool? Isdelete { get; set; }
+    public string? UpdatedBy { get; set; }
 }

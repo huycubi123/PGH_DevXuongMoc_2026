@@ -1,0 +1,123 @@
+﻿@model PGH_DevXuongMoc_2026.Models.Product
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "_LayoutAdmin";
+}
+
+<h1>Create</h1>
+
+<h4>Product</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label"></label>
+                <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Slug" class="control-label"></label>
+                <input asp-for="Slug" class="form-control" />
+                <span asp-validation-for="Slug" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ShortDescription" class="control-label"></label>
+                <input asp-for="ShortDescription" class="form-control" />
+                <span asp-validation-for="ShortDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ShortSpec" class="control-label"></label>
+                <input asp-for="ShortSpec" class="form-control" />
+                <span asp-validation-for="ShortSpec" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Spec" class="control-label"></label>
+                <input asp-for="Spec" class="form-control" />
+                <span asp-validation-for="Spec" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Care" class="control-label"></label>
+                <input asp-for="Care" class="form-control" />
+                <span asp-validation-for="Care" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Warranty" class="control-label"></label>
+                <input asp-for="Warranty" class="form-control" />
+                <span asp-validation-for="Warranty" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Commitment" class="control-label"></label>
+                <input asp-for="Commitment" class="form-control" />
+                <span asp-validation-for="Commitment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Features" class="control-label"></label>
+                <input asp-for="Features" class="form-control" />
+                <span asp-validation-for="Features" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WarrantyMonths" class="control-label"></label>
+                <input asp-for="WarrantyMonths" class="form-control" />
+                <span asp-validation-for="WarrantyMonths" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rating" class="control-label"></label>
+                <input asp-for="Rating" class="form-control" />
+                <span asp-validation-for="Rating" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsFeatured" /> @Html.DisplayNameFor(model => model.IsFeatured)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="ViewCount" class="control-label"></label>
+                <input asp-for="ViewCount" class="form-control" />
+                <span asp-validation-for="ViewCount" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsDeleted" /> @Html.DisplayNameFor(model => model.IsDeleted)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreatedBy" class="control-label"></label>
+                <input asp-for="CreatedBy" class="form-control" />
+                <span asp-validation-for="CreatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UpdatedAt" class="control-label"></label>
+                <input asp-for="UpdatedAt" class="form-control" />
+                <span asp-validation-for="UpdatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UpdatedBy" class="control-label"></label>
+                <input asp-for="UpdatedBy" class="form-control" />
+                <span asp-validation-for="UpdatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

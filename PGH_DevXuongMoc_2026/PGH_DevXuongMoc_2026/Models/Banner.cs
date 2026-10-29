@@ -7,29 +7,21 @@ public partial class Banner
 {
     public int Id { get; set; }
 
-    public string? Image { get; set; }
+    public byte Placement { get; set; }
 
-    public string? Title { get; set; }
+    public string? LinkUrl { get; set; }
 
-    public string? SubTitle { get; set; }
+    public DateTime? StartsAt { get; set; }
 
-    public string? Urls { get; set; }
+    public DateTime? EndsAt { get; set; }
 
-    public int Orders { get; set; }
+    public bool IsActive { get; set; }
 
-    public string? Type { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public DateTime? CreatedDate { get; set; }
+    public string? CreatedBy { get; set; }
 
-    public DateTime? UpdatedDate { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
-    public string? AdminCreated { get; set; }
-
-    public string? AdminUpdated { get; set; }
-
-    public string? Notes { get; set; }
-
-    public byte Status { get; set; }
-
-    public bool Isdelete { get; set; }
+    public string? UpdatedBy { get; set; }
 }

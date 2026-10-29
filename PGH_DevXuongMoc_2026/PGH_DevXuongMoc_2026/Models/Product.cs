@@ -7,51 +7,51 @@ public partial class Product
 {
     public int Id { get; set; }
 
-    public int? Cid { get; set; }
+    public int CategoryId { get; set; }
 
-    public string? Code { get; set; }
+    public string Name { get; set; } = null!;
 
-    public string? Title { get; set; }
+    public string Slug { get; set; } = null!;
 
-    public string? Description { get; set; }
+    public string? ShortDescription { get; set; }
 
-    public string? Content { get; set; }
+    public string? ShortSpec { get; set; }
 
-    public string? Image { get; set; }
+    public string? Spec { get; set; }
 
-    public string? MetaTitle { get; set; }
+    public string? Care { get; set; }
 
-    public string? MetaKeyword { get; set; }
+    public string? Warranty { get; set; }
 
-    public string? MetaDescription { get; set; }
+    public string? Commitment { get; set; }
 
-    public string? Slug { get; set; }
+    public string? Features { get; set; }
 
-    public decimal? PriceOld { get; set; }
+    public int WarrantyMonths { get; set; }
 
-    public decimal? PriceNew { get; set; }
+    public byte Rating { get; set; }
 
-    public string? Size { get; set; }
+    public byte Status { get; set; }
 
-    public int? Views { get; set; }
+    public bool IsFeatured { get; set; }
 
-    public int? Likes { get; set; }
+    public int ViewCount { get; set; }
 
-    public double? Star { get; set; }
+    public bool IsDeleted { get; set; }
 
-    public byte? Home { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public byte? Hot { get; set; }
+    public string? CreatedBy { get; set; }
 
-    public DateTime? CreatedDate { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
-    public DateTime? UpdatedDate { get; set; }
+    public string? UpdatedBy { get; set; }
 
-    public string? AdminCreated { get; set; }
+    public virtual Category Category { get; set; } = null!;
 
-    public string? AdminUpdated { get; set; }
+    public virtual ICollection<ContactRequest> ContactRequests { get; set; } = new List<ContactRequest>();
 
-    public byte? Status { get; set; }
+    public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
 
-    public bool? Isdelete { get; set; }
+    public virtual ICollection<ProductVariant> ProductVariants { get; set; } = new List<ProductVariant>();
 }
