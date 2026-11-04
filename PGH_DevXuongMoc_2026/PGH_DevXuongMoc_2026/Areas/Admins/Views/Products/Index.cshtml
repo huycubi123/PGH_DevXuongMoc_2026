@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "_LayoutAdmin";
-    var images = Model.
 }
 
 <h1>Index</h1>
@@ -14,138 +13,65 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Slug)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ShortDescription)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ShortSpec)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Spec)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Care)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Warranty)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Commitment)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Features)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WarrantyMonths)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Rating)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsFeatured)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ViewCount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsDeleted)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
+            <th>Hình ảnh</th>
+            <th>@Html.DisplayNameFor(model => model.Name)</th>
+            <th>@Html.DisplayNameFor(model => model.Slug)</th>
+            <th>Chất liệu & Giá</th>
+            <th>@Html.DisplayNameFor(model => model.ShortDescription)</th>
+            <th>@Html.DisplayNameFor(model => model.ShortSpec)</th>
+            <th>@Html.DisplayNameFor(model => model.Spec)</th>
+            <th>@Html.DisplayNameFor(model => model.WarrantyMonths)</th>
+            <th>@Html.DisplayNameFor(model => model.Rating)</th>
+            <th>@Html.DisplayNameFor(model => model.Status)</th>
+            <th>@Html.DisplayNameFor(model => model.IsFeatured)</th>
+            <th>@Html.DisplayNameFor(model => model.ViewCount)</th>
+            <th>@Html.DisplayNameFor(model => model.Category)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Slug)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ShortDescription)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ShortSpec)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Spec)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Care)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Warranty)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Commitment)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Features)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.WarrantyMonths)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Rating)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsFeatured)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ViewCount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsDeleted)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            var primaryImg = item.ProductImages.FirstOrDefault(i => i.IsPrimary) ?? item.ProductImages.FirstOrDefault();
+            <tr>
+                <td>
+                    @if (primaryImg != null)
+                    {
+                        <img src="~/@primaryImg.Path" alt="@item.Name" style="width: 50px; height: 50px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Slug)</td>
+                <td>
+                    @if (item.ProductVariants.Any())
+                    {
+                        <ul class="list-unstyled mb-0 small">
+                            @foreach (var v in item.ProductVariants)
+                            {
+                                <li>@v.MaterialName: <strong>@v.SalePrice.ToString("N0") đ</strong></li>
+                            }
+                        </ul>
+                    }
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.ShortDescription)</td>
+                <td>@Html.DisplayFor(modelItem => item.ShortSpec)</td>
+                <td>@Html.Raw(item.Spec)</td>
+                <td>@Html.DisplayFor(modelItem => item.WarrantyMonths)</td>
+                <td>@Html.DisplayFor(modelItem => item.Rating)</td>
+                <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                <td>@Html.DisplayFor(modelItem => item.IsFeatured)</td>
+                <td>@Html.DisplayFor(modelItem => item.ViewCount)</td>
+                <td>@Html.DisplayFor(modelItem => item.Category.Name)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

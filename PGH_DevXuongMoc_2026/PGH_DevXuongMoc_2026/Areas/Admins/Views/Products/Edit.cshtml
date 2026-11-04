@@ -1,4 +1,4 @@
-﻿@model PGH_DevXuongMoc_2026.Models.Product
+﻿@model PGH_DevXuongMoc_2026.Models.ProductManageVM
 
 @{
     ViewData["Title"] = "Edit";
@@ -10,111 +10,145 @@
 <h4>Product</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
+    <div class="col-md-6">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Product.Id" />
+
             <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                <label asp-for="Product.CategoryId" class="control-label"></label>
+                <select asp-for="Product.CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+                <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <label asp-for="Product.Name" class="control-label"></label>
+                <input asp-for="Product.Name" class="form-control" />
+                <span asp-validation-for="Product.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Slug" class="control-label"></label>
-                <input asp-for="Slug" class="form-control" />
-                <span asp-validation-for="Slug" class="text-danger"></span>
+                <label asp-for="Product.Slug" class="control-label"></label>
+                <input asp-for="Product.Slug" class="form-control" />
+                <span asp-validation-for="Product.Slug" class="text-danger"></span>
+            </div>
+
+            <!-- ANH HIỆN TẠI VÀ CHỌN ẢNH MỚI -->
+            <div class="form-group border p-2 my-2">
+                <label class="control-label fw-bold">Ảnh hiện tại:</label>
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                    @foreach (var img in Model.Images)
+                    {
+                        <img src="~/@img.Path" style="width: 60px; height: 60px; object-fit: cover;" class="border" />
+                    }
+                </div>
+                <label class="control-label fw-bold">Tải thêm ảnh mới</label>
+                <input type="file" asp-for="PrimaryImageFile" class="form-control" accept="image/*" />
+            </div>
+
+            <!-- CHỈNH SỬA BIẾN THỂ -->
+            <div class="form-group border p-2 my-2">
+                <label class="control-label fw-bold">Chất liệu & Giá bán</label>
+                @for (int i = 0; i < Model.Variants.Count; i++)
+                {
+                    <div class="row mb-2">
+                        <div class="col-5">
+                            <input type="text" name="Variants[@i].MaterialName" value="@Model.Variants[i].MaterialName" class="form-control" required />
+                        </div>
+                        <div class="col-3">
+                            <input type="number" name="Variants[@i].OriginalPrice" value="@Model.Variants[i].OriginalPrice" class="form-control" required />
+                        </div>
+                        <div class="col-4">
+                            <input type="number" name="Variants[@i].SalePrice" value="@Model.Variants[i].SalePrice" class="form-control" required />
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Product.ShortDescription" class="control-label"></label>
+                <input asp-for="Product.ShortDescription" class="form-control" />
+                <span asp-validation-for="Product.ShortDescription" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ShortDescription" class="control-label"></label>
-                <input asp-for="ShortDescription" class="form-control" />
-                <span asp-validation-for="ShortDescription" class="text-danger"></span>
+                <label asp-for="Product.ShortSpec" class="control-label"></label>
+                <input asp-for="Product.ShortSpec" class="form-control" />
+                <span asp-validation-for="Product.ShortSpec" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ShortSpec" class="control-label"></label>
-                <input asp-for="ShortSpec" class="form-control" />
-                <span asp-validation-for="ShortSpec" class="text-danger"></span>
+                <label asp-for="Product.Spec" class="control-label"></label>
+                <input asp-for="Product.Spec" class="form-control" />
+                <span asp-validation-for="Product.Spec" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Spec" class="control-label"></label>
-                <input asp-for="Spec" class="form-control" />
-                <span asp-validation-for="Spec" class="text-danger"></span>
+                <label asp-for="Product.Care" class="control-label"></label>
+                <input asp-for="Product.Care" class="form-control" />
+                <span asp-validation-for="Product.Care" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Care" class="control-label"></label>
-                <input asp-for="Care" class="form-control" />
-                <span asp-validation-for="Care" class="text-danger"></span>
+                <label asp-for="Product.Warranty" class="control-label"></label>
+                <input asp-for="Product.Warranty" class="form-control" />
+                <span asp-validation-for="Product.Warranty" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Warranty" class="control-label"></label>
-                <input asp-for="Warranty" class="form-control" />
-                <span asp-validation-for="Warranty" class="text-danger"></span>
+                <label asp-for="Product.Commitment" class="control-label"></label>
+                <input asp-for="Product.Commitment" class="form-control" />
+                <span asp-validation-for="Product.Commitment" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Commitment" class="control-label"></label>
-                <input asp-for="Commitment" class="form-control" />
-                <span asp-validation-for="Commitment" class="text-danger"></span>
+                <label asp-for="Product.Features" class="control-label"></label>
+                <input asp-for="Product.Features" class="form-control" />
+                <span asp-validation-for="Product.Features" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Features" class="control-label"></label>
-                <input asp-for="Features" class="form-control" />
-                <span asp-validation-for="Features" class="text-danger"></span>
+                <label asp-for="Product.WarrantyMonths" class="control-label"></label>
+                <input asp-for="Product.WarrantyMonths" class="form-control" />
+                <span asp-validation-for="Product.WarrantyMonths" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="WarrantyMonths" class="control-label"></label>
-                <input asp-for="WarrantyMonths" class="form-control" />
-                <span asp-validation-for="WarrantyMonths" class="text-danger"></span>
+                <label asp-for="Product.Rating" class="control-label"></label>
+                <input asp-for="Product.Rating" class="form-control" />
+                <span asp-validation-for="Product.Rating" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Rating" class="control-label"></label>
-                <input asp-for="Rating" class="form-control" />
-                <span asp-validation-for="Rating" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
+                <label asp-for="Product.Status" class="control-label"></label>
+                <input asp-for="Product.Status" class="form-control" />
+                <span asp-validation-for="Product.Status" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsFeatured" /> @Html.DisplayNameFor(model => model.IsFeatured)
+                    <input class="form-check-input" asp-for="Product.IsFeatured" /> @Html.DisplayNameFor(model => model.Product.IsFeatured)
                 </label>
             </div>
             <div class="form-group">
-                <label asp-for="ViewCount" class="control-label"></label>
-                <input asp-for="ViewCount" class="form-control" />
-                <span asp-validation-for="ViewCount" class="text-danger"></span>
+                <label asp-for="Product.ViewCount" class="control-label"></label>
+                <input asp-for="Product.ViewCount" class="form-control" />
+                <span asp-validation-for="Product.ViewCount" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsDeleted" /> @Html.DisplayNameFor(model => model.IsDeleted)
+                    <input class="form-check-input" asp-for="Product.IsDeleted" /> @Html.DisplayNameFor(model => model.Product.IsDeleted)
                 </label>
             </div>
             <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
+                <label asp-for="Product.CreatedAt" class="control-label"></label>
+                <input asp-for="Product.CreatedAt" class="form-control" />
+                <span asp-validation-for="Product.CreatedAt" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CreatedBy" class="control-label"></label>
-                <input asp-for="CreatedBy" class="form-control" />
-                <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                <label asp-for="Product.CreatedBy" class="control-label"></label>
+                <input asp-for="Product.CreatedBy" class="form-control" />
+                <span asp-validation-for="Product.CreatedBy" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="UpdatedAt" class="control-label"></label>
-                <input asp-for="UpdatedAt" class="form-control" />
-                <span asp-validation-for="UpdatedAt" class="text-danger"></span>
+                <label asp-for="Product.UpdatedAt" class="control-label"></label>
+                <input asp-for="Product.UpdatedAt" class="form-control" />
+                <span asp-validation-for="Product.UpdatedAt" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="UpdatedBy" class="control-label"></label>
-                <input asp-for="UpdatedBy" class="form-control" />
-                <span asp-validation-for="UpdatedBy" class="text-danger"></span>
+                <label asp-for="Product.UpdatedBy" class="control-label"></label>
+                <input asp-for="Product.UpdatedBy" class="form-control" />
+                <span asp-validation-for="Product.UpdatedBy" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
@@ -126,5 +160,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

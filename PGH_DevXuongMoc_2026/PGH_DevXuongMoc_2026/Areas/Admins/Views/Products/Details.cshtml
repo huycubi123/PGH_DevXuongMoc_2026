@@ -1,4 +1,4 @@
-﻿@model PGH_DevXuongMoc_2026.Models.Product
+﻿@model PGH_DevXuongMoc_2026.Models.ProductManageVM
 
 @{
     ViewData["Title"] = "Details";
@@ -11,130 +11,52 @@
     <h4>Product</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Slug)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Slug)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShortDescription)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShortDescription)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShortSpec)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShortSpec)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Spec)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Spec)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Care)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Care)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Warranty)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Warranty)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Commitment)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Commitment)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Features)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Features)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.WarrantyMonths)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.WarrantyMonths)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Rating)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Rating)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsFeatured)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsFeatured)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ViewCount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ViewCount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsDeleted)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsDeleted)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedBy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedBy)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdatedBy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdatedBy)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.Id)
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Product.Name)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Product.Name)</dd>
+
+        <dt class="col-sm-2">Hình ảnh</dt>
+        <dd class="col-sm-10">
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var img in Model.Images)
+                {
+                    <img src="~/@img.Path" style="width: 80px; height: 80px; object-fit: cover;" class="border" />
+                }
+            </div>
         </dd>
 
+        <dt class="col-sm-2">Biến thể & Giá</dt>
+        <dd class="col-sm-10">
+            <ul>
+                @foreach (var v in Model.Variants)
+                {
+                    <li>@v.MaterialName: <strong>@v.SalePrice.ToString("N0") đ</strong> (Giá gốc: <del>@v.OriginalPrice.ToString("N0") đ</del>)</li>
+                }
+            </ul>
+        </dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Product.Slug)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Product.Slug)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Product.ShortDescription)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Product.ShortDescription)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Product.Spec)</dt>
+        <dd class="col-sm-10">@Html.Raw(Model.Product.Spec)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Product.Care)</dt>
+        <dd class="col-sm-10">@Html.Raw(Model.Product.Care)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Product.Warranty)</dt>
+        <dd class="col-sm-10">@Html.Raw(Model.Product.Warranty)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Product.WarrantyMonths)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Product.WarrantyMonths)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Product.Category)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Product.Category.Name)</dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Product.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
