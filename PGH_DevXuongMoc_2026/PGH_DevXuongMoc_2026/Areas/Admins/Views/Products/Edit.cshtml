@@ -1,162 +1,163 @@
 ﻿@model PGH_DevXuongMoc_2026.Models.ProductManageVM
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Chỉnh sửa sản phẩm";
     Layout = "_LayoutAdmin";
 }
 
-<h1>Edit</h1>
-
-<h4>Product</h4>
+<h1 class="text-primary">Chỉnh sửa sản phẩm</h1>
 <hr />
+
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <form asp-action="Edit" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
             <input type="hidden" asp-for="Product.Id" />
 
-            <div class="form-group">
-                <label asp-for="Product.CategoryId" class="control-label"></label>
-                <select asp-for="Product.CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Product.Name" class="control-label"></label>
-                <input asp-for="Product.Name" class="form-control" />
-                <span asp-validation-for="Product.Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Product.Slug" class="control-label"></label>
-                <input asp-for="Product.Slug" class="form-control" />
-                <span asp-validation-for="Product.Slug" class="text-danger"></span>
-            </div>
-
-            <!-- ANH HIỆN TẠI VÀ CHỌN ẢNH MỚI -->
-            <div class="form-group border p-2 my-2">
-                <label class="control-label fw-bold">Ảnh hiện tại:</label>
-                <div class="d-flex flex-wrap gap-2 mb-2">
-                    @foreach (var img in Model.Images)
-                    {
-                        <img src="~/@img.Path" style="width: 60px; height: 60px; object-fit: cover;" class="border" />
-                    }
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Danh mục sản phẩm <span class="text-danger">*</span></label>
+                    <select asp-for="Product.CategoryId" class="form-select" asp-items="ViewBag.CategoryId"></select>
                 </div>
-                <label class="control-label fw-bold">Tải thêm ảnh mới</label>
-                <input type="file" asp-for="PrimaryImageFile" class="form-control" accept="image/*" />
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Tên sản phẩm <span class="text-danger">*</span></label>
+                    <input asp-for="Product.Name" class="form-control" />
+                    <span asp-validation-for="Product.Name" class="text-danger"></span>
+                </div>
             </div>
 
-            <!-- CHỈNH SỬA BIẾN THỂ -->
-            <div class="form-group border p-2 my-2">
-                <label class="control-label fw-bold">Chất liệu & Giá bán</label>
-                @for (int i = 0; i < Model.Variants.Count; i++)
-                {
-                    <div class="row mb-2">
-                        <div class="col-5">
-                            <input type="text" name="Variants[@i].MaterialName" value="@Model.Variants[i].MaterialName" class="form-control" required />
-                        </div>
-                        <div class="col-3">
-                            <input type="number" name="Variants[@i].OriginalPrice" value="@Model.Variants[i].OriginalPrice" class="form-control" required />
-                        </div>
-                        <div class="col-4">
-                            <input type="number" name="Variants[@i].SalePrice" value="@Model.Variants[i].SalePrice" class="form-control" required />
+            <div class="mb-3">
+                <label class="form-label fw-bold">Đường dẫn SEO (Slug)</label>
+                <input asp-for="Product.Slug" class="form-control" />
+            </div>
+
+            <!-- KHỐI QUẢN LÝ ẢNH (HTML THUẦN) -->
+            <div class="card mb-3 border-secondary">
+                <div class="card-header bg-light fw-bold text-primary">
+                    <i class="bi bi-images"></i> Quản lý & Tải bổ sung ảnh sản phẩm
+                </div>
+                <div class="card-body">
+                    <label class="form-label fw-bold">Các ảnh hiện có trong sản phẩm:</label>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        @if (Model.Images != null && Model.Images.Any())
+                        {
+                            @foreach (var img in Model.Images)
+                            {
+                                <div class="position-relative border rounded p-1 bg-white">
+                                    <img src="~/@img.Path" style="width: 75px; height: 75px; object-fit: cover;" class="rounded" />
+                                    @if (img.IsPrimary)
+                                    {
+                                        <span class="badge bg-success position-absolute top-0 start-0 small">Chính</span>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">1. Thay thế ảnh đại diện chính (Primary Image)</label>
+                        <input type="file" name="primaryImageFile" class="form-control" accept="image/*" />
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-bold">2. Bổ sung thêm nhiều ảnh phụ cùng lúc (Secondary Images)</label>
+                        <input type="file" name="secondaryImageFiles" class="form-control" accept="image/*" multiple />
+                        <div class="form-text text-danger fw-bold">
+                            * Lưu ý: Giữ phím Ctrl hoặc Shift để quét chọn TẤT CẢ các ảnh bạn muốn bổ sung trong 1 lần mở hộp thoại duy nhất.
                         </div>
                     </div>
-                }
+                </div>
             </div>
 
-            <div class="form-group">
-                <label asp-for="Product.ShortDescription" class="control-label"></label>
+            <div class="card mb-3 border-secondary">
+                <div class="card-header bg-light fw-bold">Biến thể chất liệu & Giá bán</div>
+                <div class="card-body">
+                    @for (int i = 0; i < Model.Variants.Count; i++)
+                    {
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-5">
+                                <label class="form-label small">Chất liệu / Biến thể</label>
+                                <input type="text" name="Variants[@i].MaterialName" value="@Model.Variants[i].MaterialName" class="form-control" required />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small">Giá gốc (VNĐ)</label>
+                                <input type="number" name="Variants[@i].OriginalPrice" value="@Model.Variants[i].OriginalPrice" class="form-control" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">Giá bán thực tế (VNĐ)</label>
+                                <input type="number" name="Variants[@i].SalePrice" value="@Model.Variants[i].SalePrice" class="form-control" required />
+                                <span asp-validation-for="Variants[@i].SalePrice" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Mô tả ngắn</label>
                 <input asp-for="Product.ShortDescription" class="form-control" />
-                <span asp-validation-for="Product.ShortDescription" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Product.ShortSpec" class="control-label"></label>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Thông số kỹ thuật tóm tắt</label>
                 <input asp-for="Product.ShortSpec" class="form-control" />
-                <span asp-validation-for="Product.ShortSpec" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Product.Spec" class="control-label"></label>
-                <input asp-for="Product.Spec" class="form-control" />
-                <span asp-validation-for="Product.Spec" class="text-danger"></span>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Thông số chi tiết (HTML)</label>
+                <textarea asp-for="Product.Spec" class="form-control" rows="3"></textarea>
             </div>
-            <div class="form-group">
-                <label asp-for="Product.Care" class="control-label"></label>
-                <input asp-for="Product.Care" class="form-control" />
-                <span asp-validation-for="Product.Care" class="text-danger"></span>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Hướng dẫn bảo quản</label>
+                    <input asp-for="Product.Care" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Chính sách bảo hành</label>
+                    <input asp-for="Product.Warranty" class="form-control" />
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Product.Warranty" class="control-label"></label>
-                <input asp-for="Product.Warranty" class="form-control" />
-                <span asp-validation-for="Product.Warranty" class="text-danger"></span>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Cam kết chất lượng</label>
+                    <input asp-for="Product.Commitment" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Tính năng nổi bật</label>
+                    <input asp-for="Product.Features" class="form-control" />
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Product.Commitment" class="control-label"></label>
-                <input asp-for="Product.Commitment" class="form-control" />
-                <span asp-validation-for="Product.Commitment" class="text-danger"></span>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Bảo hành (tháng)</label>
+                    <input asp-for="Product.WarrantyMonths" class="form-control" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Đánh giá (Rating)</label>
+                    <input asp-for="Product.Rating" class="form-control" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Trạng thái hiển thị</label>
+                    <select asp-for="Product.Status" class="form-select">
+                        <option value="1">Hiển thị</option>
+                        <option value="0">Ẩn (Tạm ẩn sản phẩm)</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Product.Features" class="control-label"></label>
-                <input asp-for="Product.Features" class="form-control" />
-                <span asp-validation-for="Product.Features" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Product.WarrantyMonths" class="control-label"></label>
-                <input asp-for="Product.WarrantyMonths" class="form-control" />
-                <span asp-validation-for="Product.WarrantyMonths" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Product.Rating" class="control-label"></label>
-                <input asp-for="Product.Rating" class="form-control" />
-                <span asp-validation-for="Product.Rating" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Product.Status" class="control-label"></label>
-                <input asp-for="Product.Status" class="form-control" />
-                <span asp-validation-for="Product.Status" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Product.IsFeatured" /> @Html.DisplayNameFor(model => model.Product.IsFeatured)
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" asp-for="Product.IsFeatured" id="isFeaturedEditCheck" />
+                <label class="form-check-label fw-bold" for="isFeaturedEditCheck">
+                    Đánh dấu là Sản phẩm nổi bật trang chủ
                 </label>
             </div>
-            <div class="form-group">
-                <label asp-for="Product.ViewCount" class="control-label"></label>
-                <input asp-for="Product.ViewCount" class="form-control" />
-                <span asp-validation-for="Product.ViewCount" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Product.IsDeleted" /> @Html.DisplayNameFor(model => model.Product.IsDeleted)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="Product.CreatedAt" class="control-label"></label>
-                <input asp-for="Product.CreatedAt" class="form-control" />
-                <span asp-validation-for="Product.CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Product.CreatedBy" class="control-label"></label>
-                <input asp-for="Product.CreatedBy" class="form-control" />
-                <span asp-validation-for="Product.CreatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Product.UpdatedAt" class="control-label"></label>
-                <input asp-for="Product.UpdatedAt" class="form-control" />
-                <span asp-validation-for="Product.UpdatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Product.UpdatedBy" class="control-label"></label>
-                <input asp-for="Product.UpdatedBy" class="form-control" />
-                <span asp-validation-for="Product.UpdatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group mt-3">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            <div class="mt-4 mb-5">
+                <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg"></i> Cập nhật sản phẩm</button>
+                <a asp-action="Index" class="btn btn-secondary ms-2">Quay lại danh sách</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

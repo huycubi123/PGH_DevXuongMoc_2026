@@ -18,20 +18,24 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
         private readonly XuongMocContext _context;
         private readonly IWebHostEnvironment _env;
 
-        public ProductsController(XuongMocContext context, IWebHostEnvironment env) 
+        public ProductsController(XuongMocContext context, IWebHostEnvironment env)
         {
             _context = context;
-            _env = env; // Lưu trữ thông tin về môi trường web, bao gồm đường dẫn đến thư mục wwwroot
+            _env = env;
         }
 
         // GET: Admins/Products
         public async Task<IActionResult> Index()
         {
-            var xuongMocContext = _context.Products
+            var products = await _context.Products
                 .Include(p => p.Category)
                 .Include(p => p.ProductVariants)
-                .Include(p => p.ProductImages);
-            return View(await xuongMocContext.ToListAsync());
+                .Include(p => p.ProductImages)
+                .AsSplitQuery()
+                .AsNoTracking()
+                .ToListAsync();
+
+            return View(products);
         }
 
         // GET: Admins/Products/Details/5
@@ -43,6 +47,8 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
                 .Include(p => p.Category)
                 .Include(p => p.ProductVariants)
                 .Include(p => p.ProductImages)
+                .AsSplitQuery()
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (product == null) return NotFound();
@@ -58,12 +64,15 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
         }
 
         // GET: Admins/Products/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            var categories = await _context.Categories.AsNoTracking().ToListAsync();
+            ViewData["CategoryId"] = new SelectList(categories, "Id", "Name");
+
             var vm = new ProductManageVM
             {
-                Variants = new List<ProductVariant> { new ProductVariant { IsDefault = true } }
+                Product = new Product { Status = 1, WarrantyMonths = 12, Rating = 5 },
+                Variants = new List<ProductVariant> { new ProductVariant { IsDefault = true, OriginalPrice = 0, SalePrice = 0 } }
             };
             return View(vm);
         }
@@ -71,22 +80,56 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
         // POST: Admins/Products/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ProductManageVM vm)
+        [RequestSizeLimit(100 * 1024 * 1024)] // Cho phép upload tối đa 100MB ảnh hàng loạt
+        public async Task<IActionResult> Create(ProductManageVM vm, IFormFile? primaryImageFile, List<IFormFile>? secondaryImageFiles)
         {
+            // 1. DỌN BỎ VALIDATION CHO CÁC ĐỐI TƯỢNG HỆ THỐNG & NAVIGATION
+            ModelState.Remove("Product.Category");
+            ModelState.Remove("Product.Slug");
+            ModelState.Remove("Product.CreatedBy");
+            ModelState.Remove("Product.UpdatedBy");
+            ModelState.Remove("Product.ProductImages");
+            ModelState.Remove("Product.ProductVariants");
+            ModelState.Remove("Product.ContactRequests");
+
+            if (vm.Variants != null)
+            {
+                for (int i = 0; i < vm.Variants.Count; i++)
+                {
+                    ModelState.Remove($"Variants[{i}].Product");
+                    ModelState.Remove($"Variants[{i}].CreatedBy");
+                    ModelState.Remove($"Variants[{i}].UpdatedBy");
+
+                    // Validate kiểm tra logic giá (SalePrice <= OriginalPrice) tránh vi phạm CHK_ProductVariant_Price
+                    if (vm.Variants[i].SalePrice > vm.Variants[i].OriginalPrice)
+                    {
+                        ModelState.AddModelError($"Variants[{i}].SalePrice", "Giá bán thực tế không được lớn hơn Giá gốc!");
+                    }
+                }
+            }
+
+            // 2. TỰ ĐỘNG TẠO SLUG NẾU ĐỂ TRỐNG
+            if (string.IsNullOrWhiteSpace(vm.Product.Slug) && !string.IsNullOrWhiteSpace(vm.Product.Name))
+            {
+                vm.Product.Slug = vm.Product.Name.ToLower().Trim().Replace(" ", "-");
+            }
+
             if (ModelState.IsValid)
             {
-                // 1. Lưu sản phẩm chính
+                // Gán thông tin audit hệ thống
                 vm.Product.CreatedAt = DateTime.Now;
                 vm.Product.CreatedBy = User.Identity?.Name ?? "Admin";
-                _context.Products.Add(vm.Product);
-                await _context.SaveChangesAsync();
+                vm.Product.ViewCount = 0;
 
-                // 2. Lưu các biến thể (ProductVariant)
+                _context.Products.Add(vm.Product);
+                await _context.SaveChangesAsync(); // Lưu để lấy Product.Id
+
+                // Lưu danh sách Biến thể
                 if (vm.Variants != null && vm.Variants.Any())
                 {
                     foreach (var variant in vm.Variants)
                     {
-                        if (!string.IsNullOrEmpty(variant.MaterialName))
+                        if (!string.IsNullOrWhiteSpace(variant.MaterialName))
                         {
                             variant.ProductId = vm.Product.Id;
                             variant.CreatedAt = DateTime.Now;
@@ -96,22 +139,21 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
                     }
                 }
 
-                // 3. Xử lý Upload Ảnh
+                // Upload Hàng loạt Ảnh (Chính & Phụ)
                 string uploadDir = Path.Combine(_env.WebRootPath, "content/images/products");
                 if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
 
-                // Upload ảnh chính
-                if (vm.PrimaryImageFile != null && vm.PrimaryImageFile.Length > 0)
+                // Upload Ảnh chính đại diện
+                if (primaryImageFile != null && primaryImageFile.Length > 0)
                 {
-                    // Tạo tên file duy nhất để tránh trùng lặp
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(vm.PrimaryImageFile.FileName); // Lấy phần mở rộng của file gốc
-                    string filePath = Path.Combine(uploadDir, fileName);    // Tạo đường dẫn đầy đủ để lưu file
-                    using (var stream = new FileStream(filePath, FileMode.Create)) // Mở file để ghi dữ liệu
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(primaryImageFile.FileName);
+                    string filePath = Path.Combine(uploadDir, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        await vm.PrimaryImageFile.CopyToAsync(stream); // Sao chép dữ liệu từ file tải lên vào file trên server
+                        await primaryImageFile.CopyToAsync(stream);
                     }
 
-                    // Lưu thông tin ảnh vào cơ sở dữ liệu
                     _context.ProductImages.Add(new ProductImage
                     {
                         ProductId = vm.Product.Id,
@@ -123,16 +165,16 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
                     });
                 }
 
-                // Upload các ảnh phụ
-                if (vm.SecondaryImageFiles != null && vm.SecondaryImageFiles.Any())
+                // Upload HÀNG LOẠT Ảnh phụ trong 1 lượt Submit
+                if (secondaryImageFiles != null && secondaryImageFiles.Any())
                 {
-                    // đuyệt từng file ảnh phụ được tải lên
-                    foreach (var file in vm.SecondaryImageFiles)
+                    foreach (var file in secondaryImageFiles)
                     {
                         if (file.Length > 0)
                         {
                             string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                             string filePath = Path.Combine(uploadDir, fileName);
+
                             using (var stream = new FileStream(filePath, FileMode.Create))
                             {
                                 await file.CopyToAsync(stream);
@@ -154,7 +196,9 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", vm.Product.CategoryId);
+
+            var categories = await _context.Categories.AsNoTracking().ToListAsync();
+            ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", vm.Product.CategoryId);
             return View(vm);
         }
 
@@ -166,11 +210,13 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
             var product = await _context.Products
                 .Include(p => p.ProductVariants)
                 .Include(p => p.ProductImages)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null) return NotFound();
 
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
+            var categories = await _context.Categories.AsNoTracking().ToListAsync();
+            ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", product.CategoryId);
 
             var vm = new ProductManageVM
             {
@@ -185,15 +231,39 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
         // POST: Admins/Products/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ProductManageVM vm)
+        [RequestSizeLimit(100 * 1024 * 1024)] // Cho phép upload tối đa 100MB ảnh hàng loạt khi chỉnh sửa
+        public async Task<IActionResult> Edit(int id, ProductManageVM vm, IFormFile? primaryImageFile, List<IFormFile>? secondaryImageFiles)
         {
             if (id != vm.Product.Id) return NotFound();
+
+            ModelState.Remove("Product.Category");
+            ModelState.Remove("Product.CreatedBy");
+            ModelState.Remove("Product.UpdatedBy");
+            ModelState.Remove("Product.ProductImages");
+            ModelState.Remove("Product.ProductVariants");
+            ModelState.Remove("Product.ContactRequests");
+
+            if (vm.Variants != null)
+            {
+                for (int i = 0; i < vm.Variants.Count; i++)
+                {
+                    ModelState.Remove($"Variants[{i}].Product");
+                    ModelState.Remove($"Variants[{i}].CreatedBy");
+                    ModelState.Remove($"Variants[{i}].UpdatedBy");
+
+                    // Validate kiểm tra logic giá (SalePrice <= OriginalPrice)
+                    if (vm.Variants[i].SalePrice > vm.Variants[i].OriginalPrice)
+                    {
+                        ModelState.AddModelError($"Variants[{i}].SalePrice", "Giá bán thực tế không được lớn hơn Giá gốc!");
+                    }
+                }
+            }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Lấy slug cũ từ CSDL để kiểm tra đổi SlugHistory
+                    // Ghi lịch sử Slug nếu người dùng sửa Slug
                     var oldProduct = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
                     if (oldProduct != null && oldProduct.Slug != vm.Product.Slug)
                     {
@@ -212,7 +282,7 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
                     vm.Product.UpdatedBy = User.Identity?.Name ?? "Admin";
                     _context.Update(vm.Product);
 
-                    // 2. Cập nhật Biến thể
+                    // 2. Cập nhật lại Biến thể
                     var oldVariants = _context.ProductVariants.Where(v => v.ProductId == id);
                     _context.ProductVariants.RemoveRange(oldVariants);
 
@@ -220,7 +290,7 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
                     {
                         foreach (var variant in vm.Variants)
                         {
-                            if (!string.IsNullOrEmpty(variant.MaterialName))
+                            if (!string.IsNullOrWhiteSpace(variant.MaterialName))
                             {
                                 variant.Id = 0;
                                 variant.ProductId = id;
@@ -231,17 +301,25 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
                         }
                     }
 
-                    // 3. Upload thêm ảnh mới nếu chọn
+                    // 3. Upload HÀNG LOẠT Ảnh mới khi bấm Cập nhật
                     string uploadDir = Path.Combine(_env.WebRootPath, "content/images/products");
                     if (!Directory.Exists(uploadDir)) Directory.CreateDirectory(uploadDir);
 
-                    if (vm.PrimaryImageFile != null && vm.PrimaryImageFile.Length > 0)
+                    // Thay thế Ảnh đại diện chính nếu có chọn file mới
+                    if (primaryImageFile != null && primaryImageFile.Length > 0)
                     {
-                        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(vm.PrimaryImageFile.FileName);
+                        var oldPrimaryImages = _context.ProductImages.Where(i => i.ProductId == id && i.IsPrimary);
+                        foreach (var oldImg in oldPrimaryImages)
+                        {
+                            oldImg.IsPrimary = false;
+                        }
+
+                        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(primaryImageFile.FileName);
                         string filePath = Path.Combine(uploadDir, fileName);
+
                         using (var stream = new FileStream(filePath, FileMode.Create))
                         {
-                            await vm.PrimaryImageFile.CopyToAsync(stream);
+                            await primaryImageFile.CopyToAsync(stream);
                         }
 
                         _context.ProductImages.Add(new ProductImage
@@ -255,6 +333,34 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
                         });
                     }
 
+                    // Đẩy HÀNG LOẠT nhiều ảnh phụ mới vào Album trong cùng 1 lần Submit
+                    if (secondaryImageFiles != null && secondaryImageFiles.Any())
+                    {
+                        foreach (var file in secondaryImageFiles)
+                        {
+                            if (file.Length > 0)
+                            {
+                                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                                string filePath = Path.Combine(uploadDir, fileName);
+
+                                using (var stream = new FileStream(filePath, FileMode.Create))
+                                {
+                                    await file.CopyToAsync(stream);
+                                }
+
+                                _context.ProductImages.Add(new ProductImage
+                                {
+                                    ProductId = id,
+                                    Path = "content/images/products/" + fileName,
+                                    AltText = vm.Product.Name,
+                                    IsPrimary = false,
+                                    CreatedAt = DateTime.Now,
+                                    CreatedBy = User.Identity?.Name ?? "Admin"
+                                });
+                            }
+                        }
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -264,7 +370,9 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", vm.Product.CategoryId);
+
+            var categories = await _context.Categories.AsNoTracking().ToListAsync();
+            ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", vm.Product.CategoryId);
             return View(vm);
         }
 
@@ -277,6 +385,8 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
                 .Include(p => p.Category)
                 .Include(p => p.ProductVariants)
                 .Include(p => p.ProductImages)
+                .AsSplitQuery()
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (product == null) return NotFound();
@@ -299,15 +409,21 @@ namespace PGH_DevXuongMoc_2026.Areas.Admins.Controllers
             var product = await _context.Products
                 .Include(p => p.ProductVariants)
                 .Include(p => p.ProductImages)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product != null)
             {
-                // Xóa file ảnh vật lý
                 foreach (var img in product.ProductImages)
                 {
-                    string filePath = Path.Combine(_env.WebRootPath, img.Path);
-                    if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+                    if (!string.IsNullOrEmpty(img.Path))
+                    {
+                        string filePath = Path.Combine(_env.WebRootPath, img.Path);
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                    }
                 }
 
                 _context.ProductImages.RemoveRange(product.ProductImages);

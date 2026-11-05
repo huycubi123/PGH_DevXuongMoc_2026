@@ -1,77 +1,95 @@
 ﻿@model IEnumerable<PGH_DevXuongMoc_2026.Models.Product>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Danh sách sản phẩm";
     Layout = "_LayoutAdmin";
 }
 
-<h1>Index</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 text-primary">Danh sách sản phẩm</h1>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Thêm mới sản phẩm</a>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Hình ảnh</th>
-            <th>@Html.DisplayNameFor(model => model.Name)</th>
-            <th>@Html.DisplayNameFor(model => model.Slug)</th>
-            <th>Chất liệu & Giá</th>
-            <th>@Html.DisplayNameFor(model => model.ShortDescription)</th>
-            <th>@Html.DisplayNameFor(model => model.ShortSpec)</th>
-            <th>@Html.DisplayNameFor(model => model.Spec)</th>
-            <th>@Html.DisplayNameFor(model => model.WarrantyMonths)</th>
-            <th>@Html.DisplayNameFor(model => model.Rating)</th>
-            <th>@Html.DisplayNameFor(model => model.Status)</th>
-            <th>@Html.DisplayNameFor(model => model.IsFeatured)</th>
-            <th>@Html.DisplayNameFor(model => model.ViewCount)</th>
-            <th>@Html.DisplayNameFor(model => model.Category)</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            var primaryImg = item.ProductImages.FirstOrDefault(i => i.IsPrimary) ?? item.ProductImages.FirstOrDefault();
+<div class="table-responsive">
+    <table class="table table-hover table-striped border align-middle">
+        <thead class="table-light">
             <tr>
-                <td>
-                    @if (primaryImg != null)
-                    {
-                        <img src="~/@primaryImg.Path" alt="@item.Name" style="width: 50px; height: 50px; object-fit: cover;" />
-                    }
-                    else
-                    {
-                        <span>-</span>
-                    }
-                </td>
-                <td>@Html.DisplayFor(modelItem => item.Name)</td>
-                <td>@Html.DisplayFor(modelItem => item.Slug)</td>
-                <td>
-                    @if (item.ProductVariants.Any())
-                    {
-                        <ul class="list-unstyled mb-0 small">
-                            @foreach (var v in item.ProductVariants)
-                            {
-                                <li>@v.MaterialName: <strong>@v.SalePrice.ToString("N0") đ</strong></li>
-                            }
-                        </ul>
-                    }
-                </td>
-                <td>@Html.DisplayFor(modelItem => item.ShortDescription)</td>
-                <td>@Html.DisplayFor(modelItem => item.ShortSpec)</td>
-                <td>@Html.Raw(item.Spec)</td>
-                <td>@Html.DisplayFor(modelItem => item.WarrantyMonths)</td>
-                <td>@Html.DisplayFor(modelItem => item.Rating)</td>
-                <td>@Html.DisplayFor(modelItem => item.Status)</td>
-                <td>@Html.DisplayFor(modelItem => item.IsFeatured)</td>
-                <td>@Html.DisplayFor(modelItem => item.ViewCount)</td>
-                <td>@Html.DisplayFor(modelItem => item.Category.Name)</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
+                <th>Hình ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Danh mục</th>
+                <th>Chất liệu & Giá bán</th>
+                <th>Thông số tóm tắt</th>
+                <th>Bảo hành</th>
+                <th>Trạng thái</th>
+                <th>Nổi bật</th>
+                <th>Lượt xem</th>
+                <th class="text-center">Thao tác</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var primaryImg = item.ProductImages.FirstOrDefault(i => i.IsPrimary) ?? item.ProductImages.FirstOrDefault();
+                <tr>
+                    <td>
+                        @if (primaryImg != null)
+                        {
+                            <img src="~/@primaryImg.Path" alt="@item.Name" class="rounded border" style="width: 50px; height: 50px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted small">Chưa có ảnh</span>
+                        }
+                    </td>
+                    <td class="fw-bold text-dark">@Html.DisplayFor(modelItem => item.Name)</td>
+                    <td><span class="badge bg-info text-dark">@Html.DisplayFor(modelItem => item.Category.Name)</span></td>
+                    <td>
+                        @if (item.ProductVariants != null && item.ProductVariants.Any())
+                        {
+                            <ul class="list-unstyled mb-0 small">
+                                @foreach (var v in item.ProductVariants)
+                                {
+                                    <li>@v.MaterialName: <strong class="text-danger">@v.SalePrice.ToString("N0") đ</strong></li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">Chưa có giá</span>
+                        }
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.ShortSpec)</td>
+                    <td>@item.WarrantyMonths tháng</td>
+                    <td>
+                        @if (item.Status == 1)
+                        {
+                            <span class="badge bg-success">Hiển thị</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Tạm ẩn</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.IsFeatured)
+                        {
+                            <span class="badge bg-warning text-dark">Nổi bật</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </td>
+                    <td>@item.ViewCount</td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary"><i class="bi bi-pencil"></i> Sửa</a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info"><i class="bi bi-eye"></i> Chi tiết</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger"><i class="bi bi-trash"></i> Xóa</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
